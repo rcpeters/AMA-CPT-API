@@ -1,4 +1,7 @@
-import os, json, requests, datetime
+import datetime
+import json
+import requests
+import os
 import re
 import zipfile
 
@@ -7,11 +10,12 @@ from oauthlib.oauth2 import BackendApplicationClient
 from oauthlib.oauth2.rfc6749.errors import InvalidClientError
 from requests_oauthlib import OAuth2Session
 
-
+# client id and secret should be set in environment variables
+# https://www3.ntu.edu.sg/home/ehchua/programming/howto/Environment_Variables.html
 client_id = os.environ["CLIENT_KEY"]
 client_secret = os.environ["CLIENT_SECRET"]
 
-
+# function to make debugging easier by logging response text for http errors
 def catch_exception_decorator(func):
     def inner_function(*args, **kwargs):
         try:
@@ -29,6 +33,7 @@ def catch_exception_decorator(func):
     return inner_function
 
 
+# cpt client class
 class CptClient:
     def __init__(self, client_id, client_secret):
         self.client_id = client_id
@@ -45,7 +50,7 @@ class CptClient:
         os.utime(filepath, (now, lastMod))
 
     # terrible hack to deal with missmatches in the first
-    # version of the API
+    # versions of the API
     def __cpt_pub_date(self, zippath):
         file = zipfile.ZipFile(zippath, "r")
         r = re.compile("AMA/CPT/\d{8}/")
@@ -62,6 +67,7 @@ class CptClient:
             client_secret=self.client_secret,
         )
 
+    # get cpt replease json
     @catch_exception_decorator
     def get_releases(self, dnldDdir):
         filepath = dnldDdir + "release.txt"
@@ -77,6 +83,7 @@ class CptClient:
         # self.__correct_last_mod(filepath, response)
         return response.content
 
+    # get cpt zip file
     @catch_exception_decorator
     def get_files(self, dnldDdir):
         tempFilePath = dnldDdir + "ama_cpt_temp.zip"
@@ -117,9 +124,12 @@ class CptClient:
         return latestFilePath
 
 
+# setup client
 cptClient = CptClient(client_id, client_secret)
 
+# get releases
 releases_response = cptClient.get_releases(dnldDdir="downloads/")
 
+# get zipfile
 releases_files_loc = cptClient.get_files(dnldDdir="downloads/")
 print(releases_files_loc)
