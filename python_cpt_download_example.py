@@ -19,7 +19,7 @@ client_secret = os.environ["CLIENT_SECRET"]
 def catch_exception_decorator(func):
     def inner_function(*args, **kwargs):
         try:
-            func(*args, **kwargs)
+            return func(*args, **kwargs)
         except requests.exceptions.HTTPError as err:
             print(f"HTTPError code {err.response.status_code}")
             print(f"HTTPError reason {err.response.reason}")
@@ -120,7 +120,7 @@ class CptClient:
             tempSymFilePath = latestFilePath + "_tmp"
             os.link(filePath, tempSymFilePath)
             os.replace(tempSymFilePath, latestFilePath)
-
+        print(latestFilePath)
         return latestFilePath
 
 
@@ -128,7 +128,7 @@ class CptClient:
 cptClient = CptClient(client_id, client_secret)
 
 # get releases
-releases_response = cptClient.get_releases(dnldDdir="downloads/")
+# releases_response = cptClient.get_releases(dnldDdir="downloads/")
 
 # get zipfile
 releases_files_loc = cptClient.get_files(dnldDdir="downloads/")
