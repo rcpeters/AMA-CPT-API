@@ -1,3 +1,9 @@
+# Exclude files from default downloads
+downloads/
+
+# MS Visual Code
+.vscode
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
