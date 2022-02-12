@@ -1,6 +1,6 @@
 # AMA-CPT-API
 
-Currently this repo is an example python client of AMA's CPT API, [CPTAPI_Zip](https://platform.ama-assn.org/ama/#/devportal/portal/api). As of version 1.0.0 CPTAPI_Zip (Feb 2022) the releases.json doesn't provide a pointer to which CPT Zip is returned. For example there are releases with dates in the future in the file. Regardless of the flaws we should celebrate the step forward for AMA CPT. To overcome the 1.0.0 issues the script does the following:
+Currently this repo is an example python client of AMA's CPT API, [CPTAPI_Zip](https://platform.ama-assn.org/ama/#/devportal/portal/api). As of version 1.0.0 CPTAPI_Zip (Feb 2022) the releases.json doesn't provide a reliable pointer to which CPT Zip is returned. For example there are releases with dates in the future in the releases.json. Regardless of the flaws we should celebrate the step forward for AMA CPT. To overcome the 1.0.0 issues the script does the following:
 
 * The API's HTTP response Last-Modified date is read and compared to the local copy of the cpt zip file.
 
