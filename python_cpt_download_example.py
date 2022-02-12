@@ -119,7 +119,7 @@ class CptClient:
 
 cptClient = CptClient(client_id, client_secret)
 
-# releases_response = cptClient.get_releases(dnldDdir="downloads/")
+releases_response = cptClient.get_releases(dnldDdir="downloads/")
 
 releases_files_loc = cptClient.get_files(dnldDdir="downloads/")
 print(releases_files_loc)
