@@ -15,23 +15,6 @@ from requests_oauthlib import OAuth2Session
 client_id = os.environ["CLIENT_KEY"]
 client_secret = os.environ["CLIENT_SECRET"]
 
-# function to make debugging easier by logging response text for http errors
-def catch_exception_decorator(func):
-    def inner_function(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except requests.exceptions.HTTPError as err:
-            print(f"HTTPError code {err.response.status_code}")
-            print(f"HTTPError reason {err.response.reason}")
-            print(f"HTTPError text {err.response.text}")
-            raise
-        except InvalidClientError as err:
-            print(f"HTTPError code {err.status_code}")
-            print(f"URL encoded {err.urlencoded}")
-            raise
-
-    return inner_function
-
 
 # cpt client class
 class CptClient:
@@ -40,6 +23,23 @@ class CptClient:
         self.client_secret = client_secret
         self.client = BackendApplicationClient(client_id=self.client_id)
         self.oauth = OAuth2Session(client=self.client)
+
+    # function to make debugging easier by logging response text for http errors
+    def __catch_exception_decorator(func):
+        def inner_function(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except requests.exceptions.HTTPError as err:
+                print(f"HTTPError code {err.response.status_code}")
+                print(f"HTTPError reason {err.response.reason}")
+                print(f"HTTPError text {err.response.text}")
+                raise
+            except InvalidClientError as err:
+                print(f"HTTPError code {err.status_code}")
+                print(f"URL encoded {err.urlencoded}")
+                raise
+
+        return inner_function
 
     def __header_last_mod(self, response):
         return parsedate_to_datetime(response.headers["Last-Modified"]).timestamp()
@@ -59,7 +59,7 @@ class CptClient:
         file.close()
         return pub_date
 
-    @catch_exception_decorator
+    @__catch_exception_decorator
     def get_auth(self):
         return self.oauth.fetch_token(
             token_url="https://api-platform.ama-assn.org/token",
@@ -68,7 +68,7 @@ class CptClient:
         )
 
     # get cpt replease json
-    @catch_exception_decorator
+    @__catch_exception_decorator
     def get_releases(self, dnldDdir):
         filepath = dnldDdir + "release.txt"
         self.get_auth()
@@ -84,7 +84,7 @@ class CptClient:
         return response.content
 
     # get cpt zip file
-    @catch_exception_decorator
+    @__catch_exception_decorator
     def get_files(self, dnldDdir):
         tempFilePath = dnldDdir + "ama_cpt_temp.zip"
         latestFilePath = dnldDdir + "ama_cpt_latest.zip"
@@ -120,7 +120,6 @@ class CptClient:
             tempSymFilePath = latestFilePath + "_tmp"
             os.link(filePath, tempSymFilePath)
             os.replace(tempSymFilePath, latestFilePath)
-        print(latestFilePath)
         return latestFilePath
 
 
@@ -131,5 +130,4 @@ cptClient = CptClient(client_id, client_secret)
 # releases_response = cptClient.get_releases(dnldDdir="downloads/")
 
 # get zipfile
-releases_files_loc = cptClient.get_files(dnldDdir="downloads/")
-print(releases_files_loc)
+print(cptClient.get_files(dnldDdir="downloads/"))
